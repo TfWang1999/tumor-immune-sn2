@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "Please cite this version when using the figure-reproduction code or data."
+type: software
+title: "Antigen-driven tumour–immune multistability: minimal reproduction code"
+authors:
+  - family-names: Wang
+    given-names: Tengfei
+version: 1.0.0
+date-released: 2026-10-16
+repository-code: "https://github.com/TfWang1999/antigen-driven-tumor-immune-reproducibility"
+url: "https://github.com/TfWang1999/antigen-driven-tumor-immune-reproducibility/tree/v1.0.0"
+abstract: "Standalone plotting and numerical-generation routines for five main figures and Table 1 of a tumour–immune–dendritic-cell multistability study. Includes scalar equilibrium and SN2 calculations, shooting/Floquet analysis, two AUTO07p parameter planes, selected time series, and supplied figure source data."
+keywords:
+  - tumour-immune dynamics
+  - dendritic cells
+  - bifurcation
+  - multistability
+  - reproducibility

@@ -1,0 +1,21 @@
+{
+  "alpha0": 0.96925,
+  "gamma0": 0.05,
+  "lambdaT_per_day": 0.19385,
+  "dD_per_day": 0.010000000000000002,
+  "period_days": 271.5503481621299,
+  "period_tau": 105.55745903817551,
+  "period_tau0": 54.31006963242599,
+  "x_min": 0.1216330818141843,
+  "x_max": 0.4212038939376163,
+  "leading_transverse_multiplier": 0.9890044069341998,
+  "small_transverse_multiplier_Liouville": 8.690034072676648e-15,
+  "closure": 3.131650494481164e-11,
+  "phase_residual": 1.4839796058652155e-12,
+  "trivial_mode_error": 2.0566765313397943e-10,
+  "state0_ref": [
+    0.4212038939176083,
+    1.1249524567462255,
+    1.6454691112094013
+  ]
+}

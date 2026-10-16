@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+outputs/
+_work/
+.venv/
+*.o
+*.exe
+*.mod

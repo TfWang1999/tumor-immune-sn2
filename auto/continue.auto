@@ -1,0 +1,111 @@
+"""Minimal AUTO07p workflow: the two Figure 4 slices and two displayed planes.
+Run using generate_figure_04.py --auto; no archived AUTO solutions are required.
+"""
+import csv,json,os
+q=json.load(open('parameters.json'))['analysis']['normalized']
+rho=q['r'];mapping={1:'sT',2:'lambdaT',3:'dT',4:'lambdaD',5:'KA',6:'dD',7:'KC',9:'r'}
+base={i:q[k] for i,k in mapping.items()};base[10]=1.
+constants=dict(NDIM=3,IPS=1,IRS=0,ILP=1,ICP=[2],NTST=180,NCOL=4,IAD=3,ISP=2,
+    ISW=1,IPLT=0,NBC=0,NINT=0,NMX=650,NPR=1,MXBF=10,IID=2,ITMX=10,ITNW=8,
+    NWTN=3,JAC=1,EPSL=1e-10,EPSU=1e-10,EPSS=1e-9,DS=.001,DSMIN=1e-9,
+    DSMAX=.003,IADS=1,NPAR=11,RL0=.05,RL1=80.,THU={},UZR={},UZSTOP={})
+def start(**kw):
+    options=dict(constants);options.update(kw);return run(e='model',**options)
+def state(x,p):
+    y=p[9]*(1-x);return {1:x,2:y,3:p[4]/p[6]*x*y/(p[5]+x*y)}
+def roots(p):
+    def f(x):
+        u=state(x,p);return p[1]*x**4/(p[7]**4+x**4)+(p[2]*u[3]/(1+u[3])-p[3])*u[2]
+    out=[];l=1e-12;fl=f(l)
+    for j in range(1,10001):
+        r=j/10000.;fr=f(r)
+        if fl*fr<0:
+            a,b=l,r;fa=fl
+            for _ in range(60):
+                m=(a+b)/2;fm=f(m)
+                if fa*fm<=0:b=m
+                else:a=m;fa=fm
+            out.append(state((a+b)/2,p))
+        l,fl=r,fr
+    if not out:raise RuntimeError('No equilibrium seed')
+    return out
+def job(name,operation):
+    if os.path.exists('s.'+name):return loadbd(name)
+    print('START',name,flush=True);b=operation();sv(b,name);return b
+def signed(name):
+    out={}
+    for line in open('b.'+name):
+        parts=line.split()
+        try:
+            br,pt,ty,lab=map(int,parts[:4])
+            if lab:out[lab]=pt
+        except (ValueError,TypeError):pass
+    return out
+def write(path,rows):
+    with open(path,'w',newline='') as f:
+        w=csv.DictWriter(f,fieldnames=list(rows[0]));w.writeheader();w.writerows(rows)
+def export(branches,folder,fast=False):
+    os.makedirs(folder,exist_ok=True);rows=[]
+    for name,kind in branches:
+        signs=signed(name)
+        for s in loadbd(name)():
+            pt=signs[int(s['LAB'])];xx=s['U(1)'];a=float(s['PAR(2)'])
+            row=dict(branch=name,kind=kind,alpha0=a,x_min=min(xx),x_max=max(xx),
+                period_tau0=float(s['PAR(11)']) if kind=='cycle' else 0.,
+                signed_pt=pt,type=s['TY name'],label=int(s['LAB']))
+            if fast:row.update(parameter='2',second_parameter='0',chart='physical',alpha=a,pt=pt,plot_valid=s['TY name']!='MX')
+            rows.append(row)
+    write(folder+'/branches.csv',rows)
+    write(folder+'/landmarks.csv',[r for r in rows if r['type'] in ['LP','HB','UZ']])
+
+fast=dict(base);fast[6]=.5;probe=dict(fast);probe[2]=8.
+low=job('eq_alpha_low_bw',lambda:start(PAR=probe,U=roots(probe)[0],DS=-.01,DSMAX=.08,NMX=1400))
+for suffix,sign in [('fw',1),('bw',-1)]:
+    job('eq_alpha_high_'+suffix,lambda sign=sign:start(PAR=fast,U=roots(fast)[-1],DS=sign*.01,DSMAX=.08,NMX=1400))
+hb=low('HB1')
+job('po_alpha_h1_phys_fw',lambda:run(hb,IPS=2,ISW=1,ICP=[2,11],DS=.001,DSMAX=.02,
+    DSMIN=1e-7,NMX=100,NPR=1,NTST=120,THU={},UZSTOP={11:100.},EPSL=1e-9,EPSU=1e-9,EPSS=1e-8))
+export([('eq_alpha_low_bw','equilibrium'),('eq_alpha_high_fw','equilibrium'),
+        ('eq_alpha_high_bw','equilibrium'),('po_alpha_h1_phys_fw','cycle')],'continuation',True)
+
+slow=dict(base);slow[6]=.05;probe=dict(slow);probe[2]=1.04
+eq=job('eq_low',lambda:start(PAR=probe,U=roots(probe)[0],DS=-.0002,DSMAX=.001,NMX=650,RL0=.85,RL1=1.05))
+job('eq_high',lambda:start(PAR=slow,U=roots(slow)[-1],DS=-.002,DSMAX=.01,NMX=350,RL0=.85,RL1=4.))
+hb=eq('HB1')
+po=job('po_fw',lambda:run(hb,IPS=2,ISW=1,ICP=[2,11],DS=.00015,DSMAX=.003,
+    DSMIN=1e-8,NMX=500,NPR=1,NTST=180,THU={},RL0=.85,RL1=1.05,
+    UZR={2:[.963,.965,.967,.968,.969,.970,.98,1.]},UZSTOP={11:800.},EPSL=1e-10,EPSU=1e-10,EPSS=1e-9))
+export([('eq_low','equilibrium'),('eq_high','equilibrium'),('po_fw','cycle')],'periodic')
+fold_eq=job('fold_eq',lambda:run(hb,IPS=1,ISW=1,ICP=[2],DS=-.001,
+    DSMAX=.006,DSMIN=1e-9,NMX=300,NPR=1,RL0=.65,RL1=1.5,UZR={},UZSTOP={}))
+
+rows=[]
+for plane,free in [('sigma_alpha',[2,1]),('alpha_beta',[2,4])]:
+    for family,seed in [('SN',fold_eq('LP1')),('Hopf',hb),('LPC',po('LP1'))]:
+        for direction,sign in [('fw',1),('bw',-1)]:
+            name=plane+'_'+family+'_'+direction;cycle=family=='LPC'
+            limits={1:[0.,1.],11:150.} if plane=='sigma_alpha' else {1:[0.,.32],2:[.65,1.6],4:[.16,.5],11:150.}
+            if not cycle:limits.pop(11,None)
+            def operation(seed=seed,sign=sign,cycle=cycle):
+                step=.00005 if plane=='sigma_alpha' else .0003
+                s=run(seed,IPS=2 if cycle else 1,ISW=2,ICP=free+([11] if cycle else []),
+                    DS=sign*step,DSMAX=4*step,DSMIN=1e-10,NMX=4,NPR=1,NTST=180,THU={},
+                    RL0=.5 if plane=='sigma_alpha' else .65,RL1=1.8 if plane=='sigma_alpha' else 1.6,
+                    UZR={},UZSTOP=limits,EPSL=1e-11,EPSU=1e-11,EPSS=1e-10)
+                return run(s,DS=sign*(.0002 if plane=='sigma_alpha' else .001),
+                    DSMAX=.003 if cycle else .012,NMX=420 if cycle else 230,NPR=1,
+                    UZR={1:[0.,.016,.04,.08,.16,.32,.64,1.]} if plane=='sigma_alpha' else {},UZSTOP=limits)
+            b=job(name,operation)
+            for j,s in enumerate(b()):
+                p={i:float(s['PAR(%d)'%i]) for i in mapping};xx=list(s['U(1)'])
+                u=list(zip(s['U(1)'],s['U(2)'],s['U(3)']))
+                x,y,z=u[0];xy=x*y
+                residual=max(abs(p[9]*x*(1-x)-xy),abs(p[1]*x**4/(p[7]**4+x**4)+(p[2]*z/(1+z)-p[3])*y),abs(p[4]*xy/(p[5]+xy)-p[6]*z))
+                period=float(s['PAR(11)'])*rho if cycle else 0.
+                valid=s['TY name']!='MX' and min(min(v) for v in u)>-1e-8 and max(xx)<1+1e-8 and p[1]>=-1e-10 and p[2]>0 and p[4]>0
+                valid=valid and (max(xx)-min(xx)>.002 and period<300 if cycle else residual<1e-7)
+                rows.append(dict(plane=plane,family=family,direction=direction,branch=name,point=j,
+                    type=s['TY name'],label=int(s['LAB']),alpha=p[2]/rho,sigma=p[1]/rho**2,
+                    beta=p[4]/rho,gamma=p[6]/rho,x_min=min(xx),x_max=max(xx),period=period,valid=valid))
+write('planes.csv',rows)
+print('COMPLETE: two slices and two parameter planes.',flush=True)
