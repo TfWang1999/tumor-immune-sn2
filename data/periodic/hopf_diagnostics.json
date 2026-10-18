@@ -1,0 +1,297 @@
+{
+  "model": "M4; LLC reference; only expansion varies within each DC-decay slice",
+  "coordinates": {
+    "growth": "tau=r*(t-t1), state=(x,y,z), alpha=lambda_T/r",
+    "fixed_clock": "tau0=r0*(t-t1), state=(x,y0,z), alpha0=lambda_T/r0",
+    "r0": 0.2,
+    "rho": 1.9436075069060876,
+    "y0": "rho*y"
+  },
+  "method": {
+    "hopf": "Existing model.hopfs: scalar Routh-Hurwitz root and analytic Jacobian",
+    "crossing": "Re<p,(f_u_alpha0 + D_u J * u_alpha0)q>; u_alpha0=-J^-1 f_alpha0",
+    "crossing_scaling": "d Re(lambda_tau)/d alpha = d Re(lambda_tau0)/d alpha0 at fixed rho",
+    "lyapunov": "l1=Re<p,C(q,q,qbar)-2B(q,J^-1 B(q,qbar))+B(qbar,(2*i*omega*I-J)^-1 B(q,q))>/(2*omega)",
+    "tensors": "B=D2f analytic; C=D3f from centred differences of B in fixed-clock coordinates; tensors transformed for growth-clock result",
+    "normalization": "Jq=i*omega*q; J.T*p=-i*omega*p; norm(q,2)=1; conjugate(p).T*q=1, separately in each coordinate convention",
+    "sign": "l1<0: supercritical/stable small cycle; l1>0: subcritical/saddle small cycle when the third eigenvalue is negative",
+    "scope": "Floating-point local nondegeneracy diagnostics; step spans are numerical checks, not rigorous error bounds"
+  },
+  "environment": {
+    "python": "3.11.15",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1"
+  },
+  "results": {
+    "fast": {
+      "alpha": 2.028030925714821,
+      "gamma": 0.25725358552248034,
+      "alpha0": 3.9416961314570287,
+      "gamma0": 0.5,
+      "equilibrium_growth": [
+        0.30931258029070513,
+        0.6906874197092949,
+        0.17954194597159376
+      ],
+      "parameters_fixed_clock": {
+        "r": 1.9436075069060876,
+        "K": 1,
+        "eta": 1,
+        "lambdaT": 3.9416961314570287,
+        "KD": 1,
+        "dT": 0.6,
+        "lambdaD": 0.305967261904762,
+        "KA": 1,
+        "dD": 0.5,
+        "sT": 0.016,
+        "KC": 1.5000000000000002,
+        "n": 4,
+        "saturated": 1.0
+      },
+      "crossing_derivative": 0.1993406466684841,
+      "crossing_finite_difference_checks": [
+        {
+          "step_alpha0": 2e-05,
+          "step_alpha": 1.0290143420899214e-05,
+          "derivative": 0.19934064673845367,
+          "analytic_difference": 6.996955792537563e-11
+        },
+        {
+          "step_alpha0": 1e-05,
+          "step_alpha": 5.145071710449607e-06,
+          "derivative": 0.19934064668604334,
+          "analytic_difference": 1.7559231846320245e-11
+        },
+        {
+          "step_alpha0": 5e-06,
+          "step_alpha": 2.5725358552248035e-06,
+          "derivative": 0.19934064661684955,
+          "analytic_difference": 5.163455774059855e-11
+        }
+      ],
+      "l1_growth": -2.8644052769480144,
+      "l1_fixed_clock": -1.118992143248936,
+      "l1_step_span": {
+        "fixed_clock": 1.8540879942463562e-10,
+        "growth_clock": 4.746105730646377e-10
+      },
+      "lyapunov_step_checks": [
+        {
+          "relative_step": 2e-05,
+          "fixed_clock": {
+            "l1": -1.1189921434004504,
+            "omega": 0.34788342658687643,
+            "G21": [
+              -0.7785576423398841,
+              -2.092427033217206
+            ],
+            "normalization_error": 1.3877787807814457e-17,
+            "eigenvector_residual": 1.7388818282700985e-16
+          },
+          "growth_clock": {
+            "l1": -2.864405277335862,
+            "omega": 0.1789885176666412,
+            "G21": [
+              -1.0253913091737004,
+              -2.7558094330597767
+            ],
+            "normalization_error": 5.551115123125783e-17,
+            "eigenvector_residual": 1.819064604165996e-16
+          }
+        },
+        {
+          "relative_step": 1e-05,
+          "fixed_clock": {
+            "l1": -1.118992143248936,
+            "omega": 0.34788342658687643,
+            "G21": [
+              -0.7785576422344656,
+              -2.092427034294258
+            ],
+            "normalization_error": 1.3877787807814457e-17,
+            "eigenvector_residual": 1.7388818282700985e-16
+          },
+          "growth_clock": {
+            "l1": -2.8644052769480144,
+            "omega": 0.1789885176666412,
+            "G21": [
+              -1.0253913090348599,
+              -2.755809434478296
+            ],
+            "normalization_error": 5.551115123125783e-17,
+            "eigenvector_residual": 1.819064604165996e-16
+          }
+        },
+        {
+          "relative_step": 5e-06,
+          "fixed_clock": {
+            "l1": -1.1189921432150416,
+            "omega": 0.34788342658687643,
+            "G21": [
+              -0.7785576422108829,
+              -2.0924270345690386
+            ],
+            "normalization_error": 1.3877787807814457e-17,
+            "eigenvector_residual": 1.7388818282700985e-16
+          },
+          "growth_clock": {
+            "l1": -2.8644052768612513,
+            "omega": 0.1789885176666412,
+            "G21": [
+              -1.0253913090038007,
+              -2.755809434840194
+            ],
+            "normalization_error": 5.551115123125783e-17,
+            "eigenvector_residual": 1.819064604165996e-16
+          }
+        }
+      ],
+      "omega_growth": 0.17898851766664106,
+      "omega_fixed_clock": 0.34788342658687643,
+      "third_eigenvalue_growth": -0.5665772336324018,
+      "third_eigenvalue_fixed_clock": -1.1012037645300203,
+      "rhs_residual_fixed_clock": 5.187229768985335e-18,
+      "rh_residual_fixed_clock": 9.71445146547012e-16,
+      "critical_real_fixed_clock": -3.5735303605122226e-16,
+      "hessian_check_error": 1.7444418393590664e-10,
+      "classification": "supercritical",
+      "periodic_branch_side": "alpha > alpha_H",
+      "emerging_cycle_stability": "stable"
+    },
+    "slow": {
+      "alpha": 0.4988128729850275,
+      "gamma": 0.025725358552248036,
+      "alpha0": 0.9694964444750923,
+      "gamma0": 0.05,
+      "equilibrium_growth": [
+        0.24669605381101,
+        0.75330394618899,
+        1.6237748614756167
+      ],
+      "parameters_fixed_clock": {
+        "r": 1.9436075069060876,
+        "K": 1,
+        "eta": 1,
+        "lambdaT": 0.9694964444750923,
+        "KD": 1,
+        "dT": 0.6,
+        "lambdaD": 0.305967261904762,
+        "KA": 1,
+        "dD": 0.05,
+        "sT": 0.016,
+        "KC": 1.5000000000000002,
+        "n": 4,
+        "saturated": 1.0
+      },
+      "crossing_derivative": 0.31915388127075756,
+      "crossing_finite_difference_checks": [
+        {
+          "step_alpha0": 2e-05,
+          "step_alpha": 1.0290143420899214e-05,
+          "derivative": 0.31915387979572496,
+          "analytic_difference": 1.4750325960655175e-09
+        },
+        {
+          "step_alpha0": 1e-05,
+          "step_alpha": 5.145071710449607e-06,
+          "derivative": 0.3191538809038663,
+          "analytic_difference": 3.6689123961153314e-10
+        },
+        {
+          "step_alpha0": 5e-06,
+          "step_alpha": 2.5725358552248035e-06,
+          "derivative": 0.31915388118836097,
+          "analytic_difference": 8.239658955133677e-11
+        }
+      ],
+      "l1_growth": 0.10917629195482743,
+      "l1_fixed_clock": 0.059477920230432496,
+      "l1_step_span": {
+        "fixed_clock": 8.513836857737545e-11,
+        "growth_clock": 1.5627792115946448e-10
+      },
+      "lyapunov_step_checks": [
+        {
+          "relative_step": 2e-05,
+          "fixed_clock": {
+            "l1": 0.059477920298456916,
+            "omega": 0.12500081638111632,
+            "G21": [
+              0.014869577187916169,
+              -0.4826786698321224
+            ],
+            "normalization_error": 2.2215299868541707e-16,
+            "eigenvector_residual": 1.5921957316511827e-16
+          },
+          "growth_clock": {
+            "l1": 0.10917629207969166,
+            "omega": 0.06431381641455865,
+            "G21": [
+              0.014043088011271045,
+              -0.45585015336709644
+            ],
+            "normalization_error": 4.700016417724662e-17,
+            "eigenvector_residual": 4.885025661874571e-17
+          }
+        },
+        {
+          "relative_step": 1e-05,
+          "fixed_clock": {
+            "l1": 0.059477920230432496,
+            "omega": 0.12500081638111632,
+            "G21": [
+              0.014869577170909953,
+              -0.48267867025421646
+            ],
+            "normalization_error": 2.2215299868541707e-16,
+            "eigenvector_residual": 1.5921957316511827e-16
+          },
+          "growth_clock": {
+            "l1": 0.10917629195482743,
+            "omega": 0.06431381641455865,
+            "G21": [
+              0.014043087995210056,
+              -0.45585015376572935
+            ],
+            "normalization_error": 4.700016417724662e-17,
+            "eigenvector_residual": 4.885025661874571e-17
+          }
+        },
+        {
+          "relative_step": 5e-06,
+          "fixed_clock": {
+            "l1": 0.05947792021331855,
+            "omega": 0.12500081638111632,
+            "G21": [
+              0.014869577166631436,
+              -0.4826786703596759
+            ],
+            "normalization_error": 2.2215299868541707e-16,
+            "eigenvector_residual": 1.5921957316511827e-16
+          },
+          "growth_clock": {
+            "l1": 0.10917629192341374,
+            "omega": 0.06431381641455865,
+            "G21": [
+              0.014043087991169387,
+              -0.4558501538653271
+            ],
+            "normalization_error": 4.700016417724662e-17,
+            "eigenvector_residual": 4.885025661874571e-17
+          }
+        }
+      ],
+      "omega_growth": 0.06431381641455873,
+      "omega_fixed_clock": 0.12500081638111632,
+      "third_eigenvalue_growth": -0.27242552290210903,
+      "third_eigenvalue_fixed_clock": -0.5294882913853554,
+      "rhs_residual_fixed_clock": 5.3190280955781044e-17,
+      "rh_residual_fixed_clock": 9.194034422677078e-17,
+      "critical_real_fixed_clock": 1.5265566588595902e-16,
+      "hessian_check_error": 1.228095235422445e-10,
+      "classification": "subcritical",
+      "periodic_branch_side": "alpha < alpha_H",
+      "emerging_cycle_stability": "saddle"
+    }
+  }
+}

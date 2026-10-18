@@ -68,6 +68,29 @@ CSV stores only the visible early windows. B1's long-time maxima/minima are
 retained in the JSON used by its relaxation inset. These computations can
 take several minutes; plotting the supplied results takes seconds.
 
+### Local Hopf diagnostics
+
+```sh
+python diagnose_hopf.py
+```
+
+This computes local diagnostics for the two M4/LLC Hopf points, without
+AUTO or trajectory integration, and saves `data/periodic/hopf_diagnostics.json`.
+The total eigenvalue crossing derivative follows the moving equilibrium as
+`alpha` varies and is checked against centred differences at three steps.
+The first Lyapunov coefficient uses the Kuznetsov convention
+`l1 = Re(G21)/(2*omega)`, with analytic second derivatives and centred
+differences for third derivatives, also checked at three steps.
+
+Both growth-time and fixed-clock results are saved. In each coordinate
+system the critical right eigenvector has Euclidean norm one, and the left
+eigenvector satisfies `conjugate(p).T @ q = 1`. Consequently, the magnitude
+of `l1` depends on the state normalization; its sign agrees between the two
+systems. The fast-decay Hopf is supercritical (`l1 < 0`) and the slow-decay
+Hopf is subcritical (`l1 > 0`); both crossing derivatives are positive.
+Residuals, step checks, coordinates and software versions accompany the
+results. These are floating-point numerical diagnostics.
+
 ### Optional AUTO07p continuation
 
 Install AUTO07p with its normal Python interface and a Fortran compiler.
